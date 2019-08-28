@@ -73,6 +73,18 @@ Course.init({
   },
 }, { sequelize });
 
+// define associations between models
+User.hasMany(Course, {
+  foreignKey: {
+    fieldName: 'userId',
+    allowNull: false,
+  }});
+Course.belongsTo(User, {
+  foreignKey: {
+    fieldName: 'userId',
+    allowNull: false,
+  }});
+
 // synchronize Models with the Database
 ( async () => {
   // Sync 'Movies' table
