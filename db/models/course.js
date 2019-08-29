@@ -12,18 +12,38 @@ module.exports = (sequelize) => {
     title: {
         type: Sequelize.STRING,
         allowNull: false,
+        validate: {
+            notEmpty: {
+              msg: "Title is required!"
+            }
+        },
     },
     description: {
         type: Sequelize.TEXT,
         allowNull: false,
+        validate: {
+            notEmpty: {
+              msg: "Description is required!"
+            }
+        },
     },
     estimatedTime: {
         type: Sequelize.STRING,
         allowNull: true,
+        validate: {
+            notEmpty: {
+              msg: "estimatedTime is required!"
+            }
+        },
     },
-    estimatedTime: {
+    materialsNeeded: {
         type: Sequelize.STRING,
-        materialsNeeded: true,
+        allowNull: true,
+        validate: {
+            notEmpty: {
+              msg: "materialsNeeded is required!"
+            }
+        },
     },
     }, { sequelize });
 
