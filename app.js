@@ -4,92 +4,14 @@
 const express = require('express');
 const morgan = require('morgan');
 
-// configure Sequelize
-const Sequelize = require('sequelize');
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: 'fsjstd-restapi.db'
-});
-
-// test connection to database
-(async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('Connection to the database successful!!');
-  } catch (err) {
-    console.error('Error connecting to the database: ', err);
-  }
-}) ();
-
-// User model
-class User extends Sequelize.Model {}
-User.init({
-  id: {
-    type: Sequelize.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  firstName: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  lastName: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  emailAddress: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  password: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-}, { sequelize });
-
-// Course model
-class Course extends Sequelize.Model {}
-Course.init({
-  id: {
-    type: Sequelize.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  title: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  description: {
-    type: Sequelize.TEXT,
-    allowNull: false,
-  },
-  estimatedTime: {
-    type: Sequelize.STRING,
-    allowNull: true,
-  },
-  estimatedTime: {
-    type: Sequelize.STRING,
-    materialsNeeded: true,
-  },
-}, { sequelize });
-
-// define associations between models
-User.hasMany(Course, {
-  foreignKey: {
-    fieldName: 'userId',
-    allowNull: false,
-  }});
-Course.belongsTo(User, {
-  foreignKey: {
-    fieldName: 'userId',
-    allowNull: false,
-  }});
+// load database
+const db = require('./db');
+const { User, Course } = db.models;
 
 // synchronize Models with the Database
 ( async () => {
-  // Sync 'Movies' table
   try {
-    await sequelize.sync({ force: true });
+    await db.sequelize.sync({ force: true });
     console.log('Synchronize to the database successful!!');
   } catch(err) {
     console.error('Error connecting to the database: ', error);
@@ -102,10 +24,15 @@ const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'tr
 // create the Express app
 const app = express();
 
+// Setup request body JSON parsing.
+app.use(express.json());
+
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
 
 // TODO setup your api routes here
+app.use('/api/users', require('./routes/users'));
+app.use('/api/courses', require('./routes/courses'));
 
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {
