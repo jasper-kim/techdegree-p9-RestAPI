@@ -13,9 +13,9 @@ router.get('/', (req, res) => {
             const users = await User.findAll();
             res.json(users).status(200).end();
         } catch(err) {
-            console.error('OMG!!! Error: ', err);
+            console.error('Cannot get user\'s info: ', err);
         }
-    } ) ()
+    } ) ();
 });
 
 // post route that creates a new user.
@@ -61,6 +61,6 @@ router.post('/', [
 
     // // Set the status to 201 Created and end the response.
     return res.status(201).end();
-  });
+});
 
 module.exports = router;
