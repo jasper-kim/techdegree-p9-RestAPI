@@ -2,8 +2,60 @@ const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
 const { models } = require('../db');
+const bcryptjs = require('bcryptjs');
+const auth = require('basic-auth');
 
+// Global variable set to Course model.
 const Course = models.Course;
+const User = models.User;
+
+// Set a middleware that attempts to get the user credentials
+// and search a matched user and verify if provided password is matched.
+const authenticateUser = async (req, res, next) => {
+    const users = await User.findAll();
+    let message = null;
+  
+    // Parse the user's credentials from the Authorization header.
+    const credentials = auth(req);
+  
+    // If the user's credentials are available...
+    if (credentials) {
+      // Search a user using provided username
+      const user = users.find(user => user.emailAddress === credentials.name);
+  
+      // If a user was successfully retrieved from the data store...
+      if (user) {
+        // Use the bcryptjs npm package to compare the user's password
+        const authenticated = bcryptjs
+          .compareSync(credentials.pass, user.password);
+  
+        // If the passwords match...
+        if (authenticated) {
+          console.log(`Authentication successful for username: ${user.emailAddress}`);
+  
+          // Then store the retrieved user object on the request object
+          req.currentUser = user;
+        } else {
+          message = `Authentication failure for username: ${user.emailAddress}`;
+        }
+      } else {
+        message = `User not found for username: ${credentials.name}`;
+      } 
+    } else {
+      message = 'Auth header not found';
+    }
+    
+    // If user authentication failed...
+    if (message) {
+      console.warn(message);
+  
+      // Return a response with a 401 Unauthorized HTTP status code.
+      res.status(401).json({ message: 'Access Denied' });
+    } else {
+      // Call the next() method, if user authentication succeeded
+      next();
+    }
+  }
 
 // get route that retrieve a list of courses.
 router.get('/', (req, res) => {
@@ -30,7 +82,7 @@ router.get('/:id', (req, res) => {
 });
 
 // post route that creates a new course.
-router.post('/', [
+router.post('/', authenticateUser, [
     check('title')
       .exists({ checkNull: true, checkFalsy: true })
       .withMessage('Please provide a value for "title"'),
@@ -49,10 +101,10 @@ router.post('/', [
   
       // If there are validation errors...
     if (!errors.isEmpty()) {
-      // Use the Array `map()` method to get a list of error messages.
-      const errorMessages = errors.array().map(error => error.msg);
-  
-      return res.status(400).json({ error: errorMessages});
+        // Use the Array `map()` method to get a list of error messages.
+        const errorMessages = errors.array().map(error => error.msg);
+        // Send validation error(s) with 400 status code   
+        return res.status(400).json({ error: errorMessages});
     }
 
     // Create a new course
@@ -69,7 +121,7 @@ router.post('/', [
 });
 
 // put route that update a exsting course.
-router.put('/:id', [
+router.put('/:id', authenticateUser, [
     check('title')
       .exists({ checkNull: true, checkFalsy: true })
       .withMessage('Please provide a value for "title"'),
@@ -88,10 +140,10 @@ router.put('/:id', [
   
       // If there are validation errors...
     if (!errors.isEmpty()) {
-      // Use the Array `map()` method to get a list of error messages.
-      const errorMessages = errors.array().map(error => error.msg);
-  
-      return res.status(400).json({ error: errorMessages});
+        // Use the Array `map()` method to get a list of error messages.
+        const errorMessages = errors.array().map(error => error.msg);
+        // Send validation error(s) with 400 status code    
+        return res.status(400).json({ error: errorMessages});
     }
 
     // Update a new course
@@ -109,7 +161,7 @@ router.put('/:id', [
     } ) ();
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', authenticateUser, (req, res) => {
     // Delete a new course
     ( async () => {
         try {
