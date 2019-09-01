@@ -3,6 +3,7 @@ const router = express.Router();
 const { check, validationResult } = require('express-validator');
 const { models } = require('../db');
 const bcryptjs = require('bcryptjs');
+
 const auth = require('basic-auth');
 
 // Global variable set to User model.
@@ -72,7 +73,24 @@ router.post('/', [
       .withMessage('Please provide a value for "last name"'),
     check('emailAddress')
       .exists({ checkNull: true, checkFalsy: true })
-      .withMessage('Please provide a value for "email address"'),
+      .withMessage('Please provide a value for "email address"')
+      // Validate if the provided email is valid
+      .normalizeEmail({ all_lowercase: true })
+      .isEmail()
+      .withMessage('Email address is invalid!')
+      // Validate if the provided email is already taken
+      .custom(async(value) => {
+        const user = await User.findAll({
+          //find search term in columns
+          where: {
+            emailAddress: value,
+          }
+        });
+        if (user.length > 0) {
+          throw new Error();
+        }
+      })
+      .withMessage('E-mail already in use'),
     check('password')
       .exists({ checkNull: true, checkFalsy: true })
       .withMessage('Please provide a value for "password"'),
