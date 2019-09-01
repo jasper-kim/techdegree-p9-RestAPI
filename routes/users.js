@@ -60,7 +60,12 @@ const authenticateUser = async (req, res, next) => {
 // get route that retrieve currently authenticated user.
 router.get('/', authenticateUser, (req, res) => {
     const user = req.currentUser;
-    res.json(user).status(200).end();
+    res.json({
+      'id': user.id, 
+      'firstName': user.firstName, 
+      'lastName': user.lastName, 
+      'emailAddress': user.emailAddress
+    }).status(200).end();
 });
 
 // post route that creates a new user.

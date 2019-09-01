@@ -61,7 +61,16 @@ const authenticateUser = async (req, res, next) => {
 router.get('/', (req, res) => {
     ( async () => {
         try {
-            const courses = await Course.findAll();
+            const courses = await Course.findAll({
+                attributes: [
+                    'id', 
+                    'title', 
+                    'description', 
+                    'estimatedTime', 
+                    'materialsNeeded', 
+                    'userId'
+                ]
+            });
             res.json(courses).status(200).end();
         } catch(err) {
             console.error('Cannot get a list of courses: ', err);
@@ -73,7 +82,18 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
     ( async () => {
         try {
-            const course = await Course.findByPk(req.params.id);
+            const course = await Course.findByPk(req.params.id,
+                {
+                    attributes: [
+                        'id', 
+                        'title', 
+                        'description', 
+                        'estimatedTime', 
+                        'materialsNeeded', 
+                        'userId'
+                    ]
+                }
+            );
             res.json(course).status(200).end();
         } catch(err) {
             console.error('Cannot get a course for the provided course ID: ', err);
