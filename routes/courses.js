@@ -89,12 +89,6 @@ router.post('/', authenticateUser, [
     check('description')
       .exists({ checkNull: true, checkFalsy: true })
       .withMessage('Please provide a value for "description"'),
-    check('estimatedTime')
-      .exists({ checkNull: false, checkFalsy: false })
-      .withMessage('Please provide a value for "estimated time"'),
-    check('materialsNeeded')
-      .exists({ checkNull: false, checkFalsy: false })
-      .withMessage('Please provide a value for "materials needed"'),
   ], (req, res) => {
       // Attempt to get the validation result from the Request object.
       const errors = validationResult(req);
@@ -128,12 +122,6 @@ router.put('/:id', authenticateUser, [
     check('description')
       .exists({ checkNull: true, checkFalsy: true })
       .withMessage('Please provide a value for "description"'),
-    check('estimatedTime')
-      .exists({ checkNull: false, checkFalsy: false })
-      .withMessage('Please provide a value for "estimated time"'),
-    check('materialsNeeded')
-      .exists({ checkNull: false, checkFalsy: false })
-      .withMessage('Please provide a value for "materials needed"'),
   ], (req, res) => {
       // Attempt to get the validation result from the Request object.
       const errors = validationResult(req);
