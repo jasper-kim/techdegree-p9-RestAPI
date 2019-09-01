@@ -70,6 +70,7 @@ router.get('/', authenticateUser, (req, res) => {
 
 // post route that creates a new user.
 router.post('/', [
+    // Validate required values contained in request body
     check('firstName')
       .exists({ checkNull: true, checkFalsy: true })
       .withMessage('Please provide a value for "first name"'),

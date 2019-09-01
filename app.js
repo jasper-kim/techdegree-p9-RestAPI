@@ -6,7 +6,6 @@ const morgan = require('morgan');
 
 // load database
 const db = require('./db');
-const { User, Course } = db.models;
 
 // synchronize Models with the Database
 ( async () => {

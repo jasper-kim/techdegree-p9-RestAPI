@@ -103,6 +103,7 @@ router.get('/:id', (req, res) => {
 
 // post route that creates a new course.
 router.post('/', authenticateUser, [
+    // Validate required values contained in request body
     check('title')
       .exists({ checkNull: true, checkFalsy: true })
       .withMessage('Please provide a value for "title"'),
@@ -136,6 +137,7 @@ router.post('/', authenticateUser, [
 
 // put route that update a exsting course.
 router.put('/:id', authenticateUser, [
+    // Validate required values contained in request body
     check('title')
       .exists({ checkNull: true, checkFalsy: true })
       .withMessage('Please provide a value for "title"'),
