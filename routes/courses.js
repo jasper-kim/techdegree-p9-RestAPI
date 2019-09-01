@@ -161,10 +161,18 @@ router.put('/:id', authenticateUser, [
         try {
             // Search a course using provided id
             const course = await Course.findByPk(req.params.id);
-            // Update a searched course
-            await course.update(req.body);
-            // Set the status to 204 Created and end the response.
-            return res.status(204).end();
+
+            const user = req.currentUser;
+
+            if (course.userId === user.id) {
+                // Update a searched course
+                await course.update(req.body);
+                // Set the status to 204 Created and end the response.
+                return res.status(204).end();
+            } else {
+                return res.status(403).end();
+            }
+            
         } catch(err) {
             console.error('Oh noooo!! Error: ', err);
         } 
@@ -177,10 +185,18 @@ router.delete('/:id', authenticateUser, (req, res) => {
         try {
             // Search a course using provided id
             const course = await Course.findByPk(req.params.id);
-            // Delete a searched course
-            await course.destroy();
-            // Set the status to 204 Created and end the response.
-            return res.status(204).end();
+
+            const user = req.currentUser;
+
+            //If the course with provided id exists and its userId is equal to user's id...
+            if (course != null && course.userId === user.id) {
+                // Delete a searched course
+                await course.destroy();
+                // Set the status to 204 Created and end the response.
+                return res.status(204).end();
+            } else {
+                return res.status(403).end();
+            }
         } catch(err) {
             console.error('Oh noooo!! Error: ', err);
         } 
