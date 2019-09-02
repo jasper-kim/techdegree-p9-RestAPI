@@ -6,8 +6,7 @@ const bcryptjs = require('bcryptjs');
 const auth = require('basic-auth');
 
 // Global variable set to Course model.
-const Course = models.Course;
-const User = models.User;
+const { User, Course } = models;
 
 // Set a middleware that attempts to get the user credentials
 // and search a matched user and verify if provided password is matched.
@@ -63,12 +62,23 @@ router.get('/', (req, res) => {
         try {
             const courses = await Course.findAll({
                 attributes: [
-                    'id', 
-                    'title', 
-                    'description', 
-                    'estimatedTime', 
-                    'materialsNeeded', 
-                    'userId'
+                        'id', 
+                        'title', 
+                        'description', 
+                        'estimatedTime', 
+                        'materialsNeeded', 
+                        'userId'
+                ],
+                include: [
+                        {
+                          model: User,
+                          attributes: [
+                                'id', 
+                                'firstName', 
+                                'lastName', 
+                                'emailAddress'
+                            ]
+                        },
                 ]
             });
             res.json(courses).status(200).end();
@@ -91,7 +101,18 @@ router.get('/:id', (req, res) => {
                         'estimatedTime', 
                         'materialsNeeded', 
                         'userId'
-                    ]
+                    ],
+                    include: [
+                        {
+                          model: User,
+                          attributes: [
+                                'id', 
+                                'firstName', 
+                                'lastName', 
+                                'emailAddress'
+                            ]
+                        },
+                ]
                 }
             );
             res.json(course).status(200).end();
@@ -125,14 +146,13 @@ router.post('/', authenticateUser, [
     // Create a new course
     ( async () => {
         try {
-            await Course.create(req.body);
+            const course = await Course.create(req.body);
+            // Set the status to 201 Created and end the response.
+    return res.location(`/api/courses/${course.id}`).status(201).end();
         } catch(err) {
             console.error('Oh noooo!! Error: ', err);
         } 
     } ) ();
-
-    // // Set the status to 201 Created and end the response.
-    return res.status(201).end();
 });
 
 // put route that update a exsting course.

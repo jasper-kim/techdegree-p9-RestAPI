@@ -7,12 +7,18 @@ const bcryptjs = require('bcryptjs');
 const auth = require('basic-auth');
 
 // Global variable set to User model.
-const User = models.User;
+const { User, Course } = models;
 
 // Set a middleware that attempts to get the user credentials
 // and search a matched user and verify if provided password is matched.
 const authenticateUser = async (req, res, next) => {
-  const users = await User.findAll();
+  const users = await User.findAll({
+    include: [
+      {
+        model: Course,
+      },
+    ]
+  });
   let message = null;
 
   // Parse the user's credentials from the Authorization header.
@@ -60,12 +66,7 @@ const authenticateUser = async (req, res, next) => {
 // get route that retrieve currently authenticated user.
 router.get('/', authenticateUser, (req, res) => {
     const user = req.currentUser;
-    res.json({
-      'id': user.id, 
-      'firstName': user.firstName, 
-      'lastName': user.lastName, 
-      'emailAddress': user.emailAddress
-    }).status(200).end();
+    res.json(user).status(200).end();
 });
 
 // post route that creates a new user.
@@ -128,7 +129,7 @@ router.post('/', [
     } ) ();
 
     // // Set the status to 201 Created and end the response.
-    return res.status(201).end();
+    return res.location('/').status(201).end();
 });
 
 module.exports = router;
