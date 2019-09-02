@@ -65,8 +65,33 @@ const authenticateUser = async (req, res, next) => {
 
 // get route that retrieve currently authenticated user.
 router.get('/', authenticateUser, (req, res) => {
-    const user = req.currentUser;
-    res.json(user).status(200).end();
+  (async () => {
+    const user = await User.findByPk(req.currentUser.id, 
+      {
+        attributes: [
+          'id', 
+          'firstName', 
+          'lastName', 
+          'emailAddress'
+      ],
+      include: [
+          {
+            model: Course,
+            attributes: [
+              'id', 
+              'title', 
+              'description', 
+              'estimatedTime', 
+              'materialsNeeded', 
+              'userId'
+              ]
+          },
+      ]
+      }
+    );
+
+    return res.json(user).status(200).end();
+  }) ();
 });
 
 // post route that creates a new user.

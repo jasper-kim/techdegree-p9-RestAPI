@@ -112,7 +112,7 @@ router.get('/:id', (req, res) => {
                                 'emailAddress'
                             ]
                         },
-                ]
+                    ]
                 }
             );
             res.json(course).status(200).end();
