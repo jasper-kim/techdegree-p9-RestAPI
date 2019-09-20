@@ -10,7 +10,7 @@ const db = require('./db');
 // synchronize Models with the Database
 ( async () => {
   try {
-    await db.sequelize.sync({ force: true });
+    await db.sequelize.sync({ force: false });
     console.log('Synchronize to the database successful!!');
   } catch(err) {
     console.error('Error connecting to the database: ', error);
