@@ -3,6 +3,7 @@
 // load modules
 const express = require('express');
 const morgan = require('morgan');
+var cors = require('cors');
 
 // load database
 const db = require('./db');
@@ -22,6 +23,13 @@ const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'tr
 
 // create the Express app
 const app = express();
+
+// Enable all CORS Requests
+var corsOptions = {
+  exposedHeaders: 'Location',
+}
+
+app.use(cors(corsOptions));
 
 // Setup request body JSON parsing.
 app.use(express.json());

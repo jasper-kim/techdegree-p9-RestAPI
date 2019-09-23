@@ -81,7 +81,7 @@ router.get('/', (req, res) => {
                         },
                 ]
             });
-            res.json(courses).status(200).end();
+            res.status(200).json(courses).end();
         } catch(err) {
             console.error('Cannot get a list of courses: ', err);
         }
@@ -115,7 +115,13 @@ router.get('/:id', (req, res) => {
                     ]
                 }
             );
-            res.json(course).status(200).end();
+
+            if(course !== null) {
+                res.json(course).status(200).end();
+            } else {
+                res.status(400).end();
+            }
+            
         } catch(err) {
             console.error('Cannot get a course for the provided course ID: ', err);
         }
@@ -140,7 +146,7 @@ router.post('/', authenticateUser, [
         // Use the Array `map()` method to get a list of error messages.
         const errorMessages = errors.array().map(error => error.msg);
         // Send validation error(s) with 400 status code   
-        return res.status(400).json({ error: errorMessages});
+        return res.status(400).json({ errors: errorMessages});
     }
 
     // Create a new course
@@ -148,7 +154,7 @@ router.post('/', authenticateUser, [
         try {
             const course = await Course.create(req.body);
             // Set the status to 201 Created and end the response.
-    return res.location(`/api/courses/${course.id}`).status(201).end();
+            return res.location(`/api/courses/${course.id}`).status(201).end();
         } catch(err) {
             console.error('Oh noooo!! Error: ', err);
         } 
@@ -173,7 +179,7 @@ router.put('/:id', authenticateUser, [
         // Use the Array `map()` method to get a list of error messages.
         const errorMessages = errors.array().map(error => error.msg);
         // Send validation error(s) with 400 status code    
-        return res.status(400).json({ error: errorMessages});
+        return res.status(400).json({ errors: errorMessages});
     }
 
     // Update a new course
